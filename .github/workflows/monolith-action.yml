@@ -1,0 +1,21 @@
+name: Test SSH connection and create file
+on:
+  push:
+    branches:
+      - monolith/main
+jobs:
+  Explore-GitHub-Actions:
+    runs-on: ubuntu-latest
+    steps:
+        - run: echo "🎉 The job was automatically triggered by a ${{ github.event_name }} event."
+
+  # Test-SSH:
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: ssh-test-hello-world
+  #       uses: appleboy/ssh-action@v1.0.0
+  #       with:
+  #         host: ${{ secrets.SSH_HOST }}
+  #         username: ${{ secrets.SSH_USERNAME }}
+  #         key: ${{ secrets.SSH_KEY }}
+  #         script: echo "deploy success" > ~/hello-world-test.txt
