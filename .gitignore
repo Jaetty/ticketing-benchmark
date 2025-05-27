@@ -1,0 +1,33 @@
+# IDE 설정
+.idea/
+*.iml
+
+# OS별 설정
+.DS_Store
+Thumbs.db
+
+# 빌드 디렉토리
+/build/
+out/
+target/
+
+# Gradle 관련
+.gradle/
+!gradle/wrapper/gradle-wrapper.jar
+
+# 환경설정
+*.env
+application.yml
+application-*.yml
+application.properties
+application-*.properties
+
+# 로그, 리포트
+*.log
+/test-output/
+
+# 컴파일 결과물
+*.class
+*.jar
+*.war
+
