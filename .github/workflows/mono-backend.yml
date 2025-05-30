@@ -3,19 +3,22 @@ on:
   push:
     branches:
       - release/backend/mono
+    types: [closed]  # 병합된 PR에만 반응하게 함
+
 jobs:
 
   change-check:
+    if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
     outputs:
-      monolith_backend_changed: ${{ steps.filter.outputs.monolith_backend }} # 밑에 Check changed files로 filter에서 demo1 부분 변수의 값을 가져옴
+      monolith_backend_changed: ${{ steps.filter.outputs.monolith_backend }} # 밑에 Check changed files로 filter에서 monolith_backend 부분 변수의 값을 가져옴
     steps:
       - uses: actions/checkout@v3
 
       - name: Check changed files
         id: filter
         uses: dorny/paths-filter@v3 
-        with: # 밑에는 demo1(변수) : - 'demo/*' (어떤 디렉토리에서 변화가 생겼는지로 true/false)
+        with: # 밑에는 demo1(변수) : - 'monolith-backend/**' (어떤 디렉토리에서 변화가 생겼는지로 true/false)
           filters: |
             monolith_backend:
               - 'monolith-backend/**'

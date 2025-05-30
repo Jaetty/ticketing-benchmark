@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 public class UserController {
 
     @GetMapping("/search")
-        public ResponseEntity<CustomBody> getUsers(@RequestParam String loginId) {
+    public ResponseEntity<CustomBody> getUsers(@RequestParam String loginId) {
 
         /* 변경 확인 테스트 */
 
