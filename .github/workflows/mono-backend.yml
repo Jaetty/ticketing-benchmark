@@ -18,7 +18,7 @@ jobs:
       - name: Check changed files
         id: filter
         uses: dorny/paths-filter@v3 
-        with: # 밑에는 demo1(변수) : - 'monolith-backend/**' (어떤 디렉토리에서 변화가 생겼는지로 true/false)
+        with: # 밑에는 monolith_backend(변수) : - 'monolith-backend/**' (어떤 디렉토리에서 변화가 생겼는지로 true/false)
           filters: |
             monolith_backend:
               - 'monolith-backend/**'
@@ -43,11 +43,11 @@ jobs:
           distribution: 'temurin' # Java가 어느 배포판인지 정의
 
       - name: Grant execute permission for gradlew
-        run: chmod +x ./demo/gradlew
+        run: chmod +x ./monolith-backend/gradlew
 
       - name: Build with Gradle
         run: ./gradlew build
-        working-directory: ./demo
+        working-directory: ./monolith-backend
 
       - name: Log in to Docker Hub
         uses: docker/login-action@v2
