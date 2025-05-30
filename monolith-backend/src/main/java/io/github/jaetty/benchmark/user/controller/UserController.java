@@ -15,7 +15,7 @@ public class UserController {
     @GetMapping("/search") // 아이디를 기준으로 확인 체크
     public ResponseEntity<CustomBody> getUsers(@RequestParam String loginId) {
 
-        /* github action 변경 확인 테스트 2 */
+        /* github action 변경 확인 테스트 3 */
 
         return ResponseEntity.ok(new CustomBody(StatusEnum.OK, "정상", "테스트 중"));
     }
