@@ -1,0 +1,79 @@
+name: mono-backend deploy yml
+on:
+  pull_request:
+    branches:
+      - release/backend/mono
+    types: [closed]  # 병합된 PR에만 반응하게 함
+
+jobs:
+
+  change-check:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    outputs:
+      monolith_backend_changed: ${{ steps.filter.outputs.monolith_backend }} # 밑에 Check changed files로 filter에서 monolith_backend 부분 변수의 값을 가져옴
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Check changed files
+        id: filter
+        uses: dorny/paths-filter@v3 
+        with: # 밑에는 monolith_backend(변수) : - 'monolith-backend/**' (어떤 디렉토리에서 변화가 생겼는지로 true/false)
+          filters: |
+            monolith_backend:
+              - 'monolith-backend/**'
+
+      - name: Show monolith_backend change status
+        run: echo "monolith_backend changed? ${{ steps.filter.outputs.monolith_backend }}"
+
+
+  build:
+    runs-on: ubuntu-latest
+    needs: change-check # check가 먼저 실행되어야한다.
+    if: needs.change-check.outputs.monolith_backend_changed == 'true' # check 부분에서 outputs에 정의된 변수 값을 확인함. 즉 특정 디렉토리에 변화가 있는지 확인.
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Set up JDK
+        uses: actions/setup-java@v3
+        with:
+          java-version: '21' # 버전 정의
+          distribution: 'temurin' # Java가 어느 배포판인지 정의
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x ./monolith-backend/gradlew
+
+      - name: Build with Gradle
+        run: ./gradlew build
+        working-directory: ./monolith-backend
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Build Docker image
+        run: docker build -t ${{ secrets.DOCKER_USERNAME }}/mono-backend-app:latest ./monolith-backend
+
+      - name: Push Docker image
+        run: docker push ${{ secrets.DOCKER_USERNAME }}/mono-backend-app:latest
+
+  k8s-update-SSH:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: ssh-k8s-apply
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_KEY }}
+          script: |
+           cd workspace/benchmark-project/k8s-setting/monolith/spring_app
+           kubectl apply -f mono-app-deployment.yml
+           kubectl apply -f mono-app-service.yml
+
+# 수동으로 아티팩트 수명 정하는 방법은 build의 with 설정에 retention-days: 1을 넣어두면 된다.
