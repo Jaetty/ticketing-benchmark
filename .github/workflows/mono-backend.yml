@@ -23,8 +23,8 @@ jobs:
             monolith_backend:
               - 'monolith-backend/**'
 
-      - name: Print changed files
-        run: git diff --name-only ${{ github.event.before }} ${{ github.sha }}
+      - name: Show monolith_backend change status
+        run: echo "monolith_backend changed? ${{ steps.filter.outputs.monolith_backend }}"
 
 
   build:
