@@ -15,6 +15,8 @@ public class UserController {
     @GetMapping("/search")
         public ResponseEntity<CustomBody> getUsers(@RequestParam String loginId) {
 
+        /* 변경 확인 테스트 */
+
         return ResponseEntity.ok(new CustomBody(StatusEnum.OK, "정상", "테스트 중"));
     }
 
