@@ -26,7 +26,7 @@ jobs:
 
   build:
     runs-on: ubuntu-latest
-    needs: check # check가 먼저 실행되어야한다.
+    needs: change-check # check가 먼저 실행되어야한다.
     if: needs.check.outputs.monolith_backend_changed == 'true' # check 부분에서 outputs에 정의된 변수 값을 확인함. 즉 특정 디렉토리에 변화가 있는지 확인.
 
     steps:
