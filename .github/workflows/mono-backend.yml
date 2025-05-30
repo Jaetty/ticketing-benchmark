@@ -1,6 +1,6 @@
 name: mono-backend deploy yml
 on:
-  push:
+  pull_request:
     branches:
       - release/backend/mono
     types: [closed]  # 병합된 PR에만 반응하게 함
