@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 @RequestMapping("/user")
 public class UserController {
 
-    @GetMapping("/search")
+    @GetMapping("/search") // 아이디를 기준으로 확인 체크
     public ResponseEntity<CustomBody> getUsers(@RequestParam String loginId) {
 
         /* 변경 확인 테스트 */
