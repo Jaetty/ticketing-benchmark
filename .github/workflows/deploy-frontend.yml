@@ -43,18 +43,18 @@ jobs:
       - name: Push Docker image
         run: docker push ${{ secrets.DOCKER_USERNAME }}/ticketing-frontend-app:latest
 
-  # k8s-update-SSH:
-  #   runs-on: ubuntu-latest
-  #   needs: build
-  #   steps:
-  #     - name: ssh-k8s-apply
-  #       uses: appleboy/ssh-action@v1.0.0
-  #       with:
-  #         host: ${{ secrets.SSH_HOST }}
-  #         username: ${{ secrets.SSH_USERNAME }}
-  #         key: ${{ secrets.SSH_KEY }}
-  #         script: |
-  #          cd workspace/benchmark-project/k8s-setting/frontend
-  #          kubectl apply -f frontend-app-deployment.yml
-  #          kubectl apply -f frontend-app-service.yml
-  #          kubectl apply -f ingress.yml
+  k8s-update-SSH:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: ssh-k8s-apply
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_KEY }}
+          script: |
+           cd workspace/benchmark-project/k8s-setting/frontend
+           kubectl apply -f frontend-app-deployment.yml
+           kubectl apply -f frontend-app-service.yml
+           kubectl apply -f ingress.yml
