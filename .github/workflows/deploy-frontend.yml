@@ -57,3 +57,4 @@ jobs:
            cd workspace/benchmark-project/k8s-setting/frontend
            kubectl apply -f frontend-app-deployment.yml
            kubectl apply -f frontend-app-service.yml
+           kubectl rollout restart deployment ticketing-frontend-app
