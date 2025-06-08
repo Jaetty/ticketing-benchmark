@@ -75,5 +75,6 @@ jobs:
            cd workspace/benchmark-project/k8s-setting/monolith/spring_app
            kubectl apply -f mono-app-deployment.yml
            kubectl apply -f mono-app-service.yml
+           kubectl rollout restart deployment mono-benchmark-spring-app
 
 # 수동으로 아티팩트 수명 정하는 방법은 build의 with 설정에 retention-days: 1을 넣어두면 된다.
