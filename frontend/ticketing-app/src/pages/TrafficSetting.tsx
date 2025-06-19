@@ -1,76 +1,73 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { trafficSettingStore } from 'stores';
 
 export default function TrafficSetting() {
   const navigate = useNavigate();
 
-  /* 아래는 버튼 관련 변수 및 함수 모음 */
+  // 시작 버튼을 눌렀을 때의 상태 변수 및 상태 변환 함수
+  const setStarted = trafficSettingStore((state) => state.setStarted);
 
-  // 라디오 설정 기억하는 변수, 그걸 교체하는 함수
-  const [selectedItem, setselectedItem] = useState<string | null>(null);
-  // 체크 박스 설정 기억하는 변수, 그걸 교체하는 함수
-  const [checkedItems, setcheckedItems] = useState<string[]>([]);
+  // 라디오 버튼을 눌렀을 때의 상태 변수 및 상태 변환 함수
+  const architecture = trafficSettingStore((state)=> state.architecture);
+  const handleRadioItemChange = trafficSettingStore((state) => state.setArchitecture);
 
-  // 라디오 변환 함수
-  const handleRadioItemChange = (option: string) => {
-    setselectedItem(option);
-  };
-
-  // 체크박스 변환 변수
-  const handleCheckBoxChange = (item: string) => {
-    setcheckedItems(prev =>
-      prev.includes(item)
-        ? prev.filter(i => i !== item) // 이미 있으면 제거
-        : [...prev, item] // 없으면 추가
-    );
-  };
-
+  // 체크 박스를 눌렀을 때의 상태 변수 및 상태 변환 함수
+  const checkedAPI = trafficSettingStore((state)=> state.checkedAPI);
+  const handleCheckBoxChange = trafficSettingStore((state) => state.toggleCheckedItem);
 
   /* 아래는 트래픽 관련 변수 및 함수 */
 
   // 트래픽 최대 인원 수 / 증가량 설정
-  const [inputs, setInputs] = useState({ population: "", stage: "" });
+  const setTrafficSetting = trafficSettingStore((state) => state.settrafficSetting);
+
+  const [localtrafficSetting, setlocaltrafficSetting] = useState({ population: "", stage: "" });
 
   const handleTextInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     // 숫자만 허용 (빈 문자열도 허용해서 지우기 가능)
     if (/^\d*$/.test(value)) {
-      setInputs((prev) => ({
+      setlocaltrafficSetting((prev) => ({
         ...prev,
         [name]: value,
       }));
     }
   };
 
-  const [maxTime, setMaxTime] = useState<number | null>(null);
-
-  const handleMaxTimeChange = (item : number) => {
-    setMaxTime(item);
-  };
+  // 트래픽 테스트 최대 시간
+  const maxTime = trafficSettingStore((state) => state.maxTime);
+  const setMaxTime = trafficSettingStore((state) => state.setMaxTime);
 
   // 시작하기 버튼 눌렀을 때 처리 부분
   const handleSubmit = () => {
-    if (selectedItem === null) {
+
+    let localChecked = [...checkedAPI];
+
+    if (architecture === null) {
       alert("아키텍처를 선택해주세요!");
       return;
     }
-    if (checkedItems.length === 0) {
-      alert("스킬을 하나 이상 선택해주세요!");
-      return;
+    if (checkedAPI.length === 0) {
+      handleCheckBoxChange('기본');
+      localChecked.push('기본');
     }
-    if (inputs.population === "") {
-      inputs.population = '10';
+    if (localtrafficSetting.population === "") {
+      localtrafficSetting.population = '10';
     }
-    if (inputs.stage === "" || inputs.stage > inputs.population) {
+    if (localtrafficSetting.stage === "" || localtrafficSetting.stage > localtrafficSetting.population) {
       // 처음부터 꽉 있는걸로로
-      inputs.stage = inputs.population;
+      localtrafficSetting.stage = localtrafficSetting.population;
     }
     if (maxTime === null){
       alert("트래픽 최대 시간을 설정해주세요!");
       return;
     }
 
-    alert(`선택한 아키텍쳐는 ${selectedItem}\n선택한 스킬은 "${checkedItems.join(", \"")}"입니다.\n최대 이용자 수는 : ${inputs.population}\n초당 이용자 증가 수 : ${inputs.stage}`);
+    // trafficSetting의 상태를 저장해줌
+    setTrafficSetting(localtrafficSetting);
+    setStarted(true);
+
+    alert(`선택한 아키텍쳐는 ${architecture}\n선택한 스킬은 "${localChecked.join(", \"")}"입니다.\n최대 이용자 수는 : ${localtrafficSetting.population}\n초당 이용자 증가 수 : ${localtrafficSetting.stage}`);
     // 예: 제출 후 다음 페이지로 이동
     navigate("/login");
   };
@@ -84,20 +81,20 @@ export default function TrafficSetting() {
         {/* 아키텍처 설정하는 부분 */}
         <h3 className="text-l font-bold mb-3">아키텍쳐 설정</h3>
         <div className="flex space-x-6 mb-4">
-          {['모놀리식', '모놀리식 WebFlux', 'MSA', 'MSA WebFlux'].map((architecture) => (
+          {['모놀리식', '모놀리식 WebFlux', 'MSA', 'MSA WebFlux'].map((selectedArchitecture) => (
             <label
-              key={architecture}
+              key={selectedArchitecture}
               className="flex items-center cursor-pointer hover:bg-gray-100 rounded p-2"
             >
               <input
                 type="radio"
-                name="architecture"
-                value={architecture}
-                checked={selectedItem === architecture}
-                onChange={() => handleRadioItemChange(architecture)}
+                name="selectedArchitecture"
+                value={selectedArchitecture}
+                checked={architecture === selectedArchitecture}
+                onChange={() => handleRadioItemChange(selectedArchitecture)}
                 className="mr-2 w-200 h-5 text-blue-600 focus:ring-blue-500"
               />
-              <span className="text-gray-800">{architecture}</span>
+              <span className="text-gray-800">{selectedArchitecture}</span>
             </label>
           ))}
         </div>
@@ -133,7 +130,7 @@ export default function TrafficSetting() {
             type="text"
             inputMode="numeric"
             name="population"
-            value={inputs.population}
+            value={localtrafficSetting.population}
             onChange={handleTextInputChange}
             placeholder="숫자만 입력해주세요. ( 기본 10, 최대 10000 )"
             className="mr-2 w-full h-5 text-red-600 rounded p-4 border-2 border-gray-200 text-right"/>
@@ -146,7 +143,7 @@ export default function TrafficSetting() {
             type="text"
             inputMode="numeric"
             name="stage"
-            value={inputs.stage}
+            value={localtrafficSetting.stage}
             onChange={handleTextInputChange}
             placeholder="숫자만 입력해주세요. ( 기본 10, 최대 10000 )"
             className="mr-2 w-full h-5 text-red-600 rounded p-4 border-2 border-gray-200 text-right"/>
@@ -164,7 +161,7 @@ export default function TrafficSetting() {
                 type="radio"
                 name="trafficOption"
                 checked={maxTime === time}
-                onChange={() => handleMaxTimeChange(time)}
+                onChange={() => setMaxTime(time)}
                 className="mr-2 w-200 h-5 text-blue-600 focus:ring-blue-500"
               />
               <span className="text-gray-800">{time}</span>

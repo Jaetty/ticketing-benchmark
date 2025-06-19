@@ -7,6 +7,7 @@ import LoginPage from "./pages/LoginPage";
 import ReservePage from "./pages/ReservePage";
 import PayPage from "./pages/PayPage";
 import DonePage from "./pages/DonePage";
+import ResultPage from "./pages/ResultPage";
 
 function App() {
   return (
@@ -17,6 +18,7 @@ function App() {
       <Route path="/reserve" element={<ReservePage />} />
       <Route path="/pay" element={<PayPage />} />
       <Route path="/done" element={<DonePage />} />
+      <Route path="/result" element={<ResultPage />} />
     </Routes>
   );
 }
