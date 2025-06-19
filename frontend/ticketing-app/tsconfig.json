@@ -1,5 +1,7 @@
 {
   "compilerOptions": {
+
+    // 기본 설정 부분
     "target": "es5",
     "lib": [
       "dom",
@@ -18,7 +20,15 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
-    "jsx": "react-jsx"
+    "jsx": "react-jsx",
+
+    // 경로 설정 부분
+    "baseUrl": "src",
+    "paths" : {
+      "pages/*": ["pages/*"],
+      "stores": ["stores"]
+    }
+
   },
   "include": [
     "src"
