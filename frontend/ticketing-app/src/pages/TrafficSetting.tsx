@@ -47,12 +47,8 @@ export default function TrafficSetting() {
       alert("아키텍처를 선택해주세요!");
       return;
     }
-    if (checkedAPI.length === 0) {
-      handleCheckBoxChange('기본');
-      localChecked.push('기본');
-    }
     if (localtrafficSetting.population === "") {
-      localtrafficSetting.population = '10';
+      localtrafficSetting.population = '100';
     }
     if (localtrafficSetting.stage === "" || localtrafficSetting.stage > localtrafficSetting.population) {
       // 처음부터 꽉 있는걸로로
@@ -61,6 +57,10 @@ export default function TrafficSetting() {
     if (maxTime === null){
       alert("트래픽 최대 시간을 설정해주세요!");
       return;
+    }
+    if (checkedAPI.length === 0) {
+      handleCheckBoxChange('기본');
+      localChecked.push('기본');
     }
 
     // trafficSetting의 상태를 저장해줌
@@ -102,7 +102,7 @@ export default function TrafficSetting() {
         {/* 기술 스택 설정 부분 */}
         <h3 className="text-l font-bold mb-3">기술 스택 설정</h3>
         <div className="flex space-x-6 mb-4">
-          {['Redis', 'SQL 최적화', '나중에 추가', '나중에 추가'].map((skills) => (
+          {['Redis', 'SQL 최적화', '대기열 기능 추가', '추후 옵션 추가'].map((skills) => (
             <label
               key={skills}
               className="flex items-center cursor-pointer hover:bg-gray-100 rounded p-2"
