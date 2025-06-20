@@ -24,6 +24,28 @@ export default function PayPage() {
     }),
   ];
 
+  const [cardNumber, setCardNumber] = useState("");
+  const [expiryMonth, setExpiryMonth] = useState('');
+  const [expiryYear, setExpiryYear] = useState('');
+  const [cvc, setCvc] = useState('');
+
+  const handleStringToNumber = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    // 숫자만 허용 (빈 문자열도 허용)
+    if (/^\d*$/.test(value)) {
+      setCvc(value);
+    }
+  };
+
+
+  // 카드 번호 포맷: 4자리마다 "-"
+  const formatCardNumber = (value: string) => {
+    // 공백 제거 후, 4글자마다 - 삽입
+    const raw = value.replace(/-/g, '').slice(0, 19); // 최대 16자
+    return raw.match(/.{1,4}/g)?.join('-') ?? raw;
+  };
+
+
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50">
       <div className="bg-white p-8 rounded shadow w-full max-w-[700px]">
@@ -35,8 +57,10 @@ export default function PayPage() {
         <div className="flex space-x-6 mb-4 justify-end">
           <input
             type="text"
-            inputMode="numeric"
-            name="population"
+            value={cardNumber}
+            onChange={(e) => setCardNumber(formatCardNumber(e.target.value))}
+            name="card"
+            maxLength={19}
             placeholder="12글자로 아무 값을 입력해주세요"
             className="mr-2 w-full h-5 text-red-600 rounded p-4 border-2 border-gray-200 text-right"/>
         </div>
@@ -45,12 +69,34 @@ export default function PayPage() {
         <div className="flex gap-4">
           {/* 만료일 */}
           <div className="flex-1">
-            <h3 className="text-l font-bold mb-3">만료</h3>
-            <input
-              type="text"
-              placeholder="MM/YY"
-              className="w-full border rounded-md px-4 py-2 text-gray-700 placeholder-gray-400"
-            />
+            <h3 className="text-l font-bold mb-3">만료 날짜</h3>
+              <div className="flex gap-2">
+                {/* 월 */}
+                <select
+                  className="w-full border rounded-md px-4 py-2"
+                  value={expiryMonth}
+                  onChange={(e) => setExpiryMonth(e.target.value)}
+                >
+                  <option value="">월</option>
+                  {Array.from({ length: 12 }, (_, i) => {
+                    const month = String(i + 1).padStart(2, '0');
+                    return <option key={month} value={month}>{month}</option>;
+                  })}
+                </select>
+
+                {/* 년 */}
+                <select
+                  className="w-full border rounded-md px-4 py-2"
+                  value={expiryYear}
+                  onChange={(e) => setExpiryYear(e.target.value)}
+                >
+                  <option value="">년</option>
+                  {Array.from({ length: 15 }, (_, i) => {
+                    const year = new Date().getFullYear() + i;
+                    return <option key={year} value={year}>{year}</option>;
+                  })}
+                </select>
+              </div>
           </div>
 
           {/* CVC */}
@@ -59,6 +105,8 @@ export default function PayPage() {
             <input
               type="numeric"
               maxLength={3}
+              value={cvc}
+              onChange={handleStringToNumber}
               placeholder="3글자"
               className="w-full border rounded-md px-4 py-2 text-gray-700 placeholder-gray-400"
             />
@@ -69,16 +117,16 @@ export default function PayPage() {
         <div className="flex-1 mt-5">
             <h3 className="text-l font-bold mb-3">할부 개월</h3>
             <select 
-              className="w-full border rounded-md px-4 py-2"
-              value={installment}
-              onChange={(e) => setInstallment(Number(e.target.value))}>
+                className="w-full border rounded-md px-4 py-2"
+                value={installment}
+                onChange={(e) => setInstallment(Number(e.target.value))}>
 
-            {installmentOptions.map((opt) => (
-              <option key={opt.value} value={opt.value}>
-                {opt.label}
-              </option>
-            ))}
-          </select>
+              {installmentOptions.map((opt) => (
+                <option key={opt.value} value={opt.value}>
+                  {opt.label}
+                </option>
+              ))}
+            </select>
         </div>
 
         {/* 결제 정보 확인 부분 */}
