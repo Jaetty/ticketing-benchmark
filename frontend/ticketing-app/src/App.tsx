@@ -8,6 +8,7 @@ import ReservePage from "./pages/ReservePage";
 import PayPage from "./pages/PayPage";
 import DonePage from "./pages/DonePage";
 import ResultPage from "./pages/ResultPage";
+import SeatSelectPage from "pages/SeatSelectPage";
 
 function App() {
   return (
@@ -16,6 +17,7 @@ function App() {
       <Route path="/traffic" element={<TrafficSetting />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/reserve" element={<ReservePage />} />
+      <Route path="/seat" element={<SeatSelectPage />} />
       <Route path="/pay" element={<PayPage />} />
       <Route path="/done" element={<DonePage />} />
       <Route path="/result" element={<ResultPage />} />
