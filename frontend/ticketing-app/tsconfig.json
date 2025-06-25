@@ -25,6 +25,8 @@
     // 경로 설정 부분
     "baseUrl": "src",
     "paths" : {
+      "types": ["types/"],
+      "component" : ["components/"],
       "pages/*": ["pages/*"],
       "stores": ["stores"]
     }

@@ -5,10 +5,10 @@ export default function ReservePage() {
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen">
-      <h1 className="text-2xl font-bold mb-4">좌석 예매 페이지</h1>
+      <h1 className="text-2xl font-bold mb-4">기차 선택 페이지</h1>
       <button
-        className="bg-green-500 text-white px-4 py-2 rounded"
-        onClick={() => navigate("/pay")}
+        className="bg-green-500 text-white px-4 py-2 rounded mt-5"
+        onClick={() => navigate("/seat")}
       >
         예매하기
       </button>
