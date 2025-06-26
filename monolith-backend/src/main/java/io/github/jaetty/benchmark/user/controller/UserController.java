@@ -18,4 +18,13 @@ public class UserController {
         return ResponseEntity.ok(new CustomBody(StatusEnum.OK, "정상", "테스트 중"));
     }
 
+    @GetMapping("/loginTest") // 로그인 테스트용 임시 API
+    public ResponseEntity<CustomBody> testLogin(@RequestParam String loginId, @RequestParam String password) {
+
+        if(loginId.equals("bench01") && password.equals("password01")) {
+            return ResponseEntity.ok(new CustomBody(StatusEnum.OK, "로그인 성공", true));
+        }
+        return ResponseEntity.ok(new CustomBody(StatusEnum.OK, "계정 정보가 일치하지 않습니다.", false));
+    }
+
 }
