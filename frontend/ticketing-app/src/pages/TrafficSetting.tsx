@@ -120,7 +120,7 @@ export default function TrafficSetting() {
         </div>
 
         {/* 트래픽 설정 부분 */}
-        <h2 className="text-xl font-bold mt-[40px]">트래픽 설정</h2>
+        <h2 className="text-xl font-bold mt-[40px]">(옵션) 내부 트래픽 설정 - CPU/RAM 사용률 증가 </h2>
         <hr className="my-6 border-gray-300 mb-8"/>
         
         {/* 최대 이용자수 설정 부분*/}
@@ -132,7 +132,7 @@ export default function TrafficSetting() {
             name="population"
             value={localtrafficSetting.population}
             onChange={handleTextInputChange}
-            placeholder="숫자만 입력해주세요. ( 기본 10, 최대 10000 )"
+            placeholder="숫자만 입력해주세요. ( 기본 0, 최대 1000 )"
             className="mr-2 w-full h-5 text-red-600 rounded p-4 border-2 border-gray-200 text-right"/>
         </div>
 
@@ -145,7 +145,7 @@ export default function TrafficSetting() {
             name="stage"
             value={localtrafficSetting.stage}
             onChange={handleTextInputChange}
-            placeholder="숫자만 입력해주세요. ( 기본 10, 최대 10000 )"
+            placeholder="숫자만 입력해주세요. ( 기본 0, 최대 1000 )"
             className="mr-2 w-full h-5 text-red-600 rounded p-4 border-2 border-gray-200 text-right"/>
         </div>
 
