@@ -101,9 +101,11 @@ insert_train_schedules(
     start_time_str = '06:00',
     end_time_str = '23:50',
     interval_minutes = 60,
-    runtime_minutes = 335,
+    runtime_minutes = 350,
     cursor = cursor,
     conn = conn)
+
+print('무궁화 넣기 끝')
 
 # ITX 넣는 코드
 insert_train_schedules(
@@ -115,10 +117,11 @@ insert_train_schedules(
     start_time_str = '06:30',
     end_time_str = '23:50',
     interval_minutes = 60,
-    runtime_minutes = 279,
+    runtime_minutes = 290,
     cursor = cursor,
     conn = conn)
 
+print('ITX 넣기 끝')
 
 # KTX 넣는 코드
 insert_train_schedules(
@@ -130,9 +133,10 @@ insert_train_schedules(
     start_time_str = '06:20',
     end_time_str = '23:50',
     interval_minutes = 20,
-    runtime_minutes = 164,
+    runtime_minutes = 175,
     cursor = cursor,
     conn = conn)
 
+print('KTX 넣기 끝')
 
 conn.close()
