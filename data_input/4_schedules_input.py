@@ -1,61 +1,77 @@
 import pymysql
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date
 from dotenv import load_dotenv
+import calendar
 import os
 
+# 첫 시작 날짜, 
+def count_trains_with_runtime(start_time_str, end_time_str, interval_minutes, runtime_minutes):
+    start_time = datetime.strptime(start_time_str, "%H:%M")
+    end_time = datetime.strptime(end_time_str, "%H:%M")
+    runtime = timedelta(minutes=runtime_minutes)
+
+    count = 0
+    current_departure = start_time
+
+    while current_departure + runtime <= end_time:
+        count += 1
+        current_departure += timedelta(minutes=interval_minutes)
+
+    return count
+
+
 def insert_train_schedules(
-    cursor,
-    initial_departure,
-    start_train_id,
     start_train_number,
-    route,
-    departure_date,
-    train_interval,
-    station_interval_list,
-    repeat_count
+    route_id,
+    start_year,
+    start_month,
+    train_type,
+    start_time_str,
+    end_time_str,
+    interval_minutes,
+    runtime_minutes,
+    cursor,
+    conn
 ):
-    train_id = start_train_id
-    train_number = start_train_number
+    
+    # 그 달의 마지막 날짜 구하기
+    last_day = calendar.monthrange(start_year, start_month)[1]
+    end_date = datetime(start_year, start_month, last_day).date()
 
-    for _ in range(1, repeat_count + 1):
+    # 현재 날짜부터 그 달 마지막 날까지 반복
+    current_date = date(start_year, start_month, 1)
+
+    # 그날 기차가 몇대까지 출발할 수 있는지 가져오기
+    # 필요한 매개변수 : 첫 출발 시간, 최대 도착 시간, 차량 출발 간격 시간, 총 운행시간(주행시간 + 역에서 기다리는 시간)
+    last_idx = count_trains_with_runtime(start_time_str, end_time_str, interval_minutes, runtime_minutes)
+
+    while current_date <= end_date:
+
+        train_number = start_train_number
+        
+        # 스케쥴이 없는 기차들 뽑아오기
         cursor.execute("""
-            INSERT INTO schedules (train_id, route_id, departure_date, train_number)
-            VALUES (%s, %s, %s, %s)
-        """, (train_id, route, departure_date, train_number))
+        SELECT trains.train_id 
+        FROM trains 
+        LEFT OUTER JOIN schedules 
+        ON trains.train_id = schedules.train_id 
+        AND schedules.departure_date = %s
+        WHERE trains.train_type_id = %s
+        AND schedules.schedule_id IS NULL;
+        """, (current_date, train_type))
 
-        depart_time = initial_departure
-        # print("  도착      출발        역")
-        # print("   ", None, " ", depart_time.strftime("%H:%M:%S"), "     1")
+        train_ids = [row[0] for row in cursor.fetchall()]
 
-        last_id = cursor.lastrowid
-        cursor.execute("""
-                INSERT INTO train_stops (schedule_id, station_id, arrival_time, departure_time)
-                VALUES (%s, %s, %s, %s)
-            """, (last_id, 1, None, depart_time))
-
-        for i, interval in enumerate(station_interval_list):
-            station_order = i + 2
-
-            arrive_time = depart_time + timedelta(minutes=interval)
-            depart_time = arrive_time + timedelta(minutes=2)
-
-            arrive_str = arrive_time.strftime("%H:%M:%S")
-            depart_str = depart_time.strftime("%H:%M:%S")
-
-            if station_order == 12:
-                depart_str = None
-
-            # print(arrive_str, " ", depart_str, "    ", station_order)
-
+        for idx in range(1, last_idx):
             cursor.execute("""
-                INSERT INTO train_stops (schedule_id, station_id, arrival_time, departure_time)
+                INSERT INTO schedules (train_id, route_id, departure_date, train_number)
                 VALUES (%s, %s, %s, %s)
-            """, (last_id, station_order, arrive_str, depart_str))
+            """, (train_ids[idx-1], route_id, current_date, train_number))
+            train_number += 1
+        
+        conn.commit()
+        current_date += timedelta(days=1)
 
-        train_id += 1
-        train_number += 1
-        initial_departure += timedelta(minutes=train_interval)
-        # print('\n')
 
 load_dotenv()  # .env 파일 읽기
 
@@ -69,65 +85,54 @@ conn = pymysql.connect(
 
 cursor = conn.cursor()
 
-mugunghwa_interval = [13, 9, 20, 27, 10, 8, 90, 80, 25, 10, 15]
-ITX_interval = [12,8,19,26,9,7,89,79,24,9,14]
-KTX_interval = [4,2,6,8,3,2,29,26,8,3,4]
-# SRT_interval = [12,8,19,26,9,7,89,79,24,9,14] # KTX랑 같음
+# 경부선 상행 무궁화호 열차 번호는 100+@, ITX는 200+@, KTX는 300+@
+Gyeongbu_up_train_number = [100, 200, 300]
 
-# 무궁화 입력
-base_date = datetime.strptime("2025-10-01", "%Y-%m-%d")
+# 경부선 하행 무궁화호 열차 번호는 100+@, ITX는 200+@, KTX는 300+@
+Gyeongbu_down_train_number = [400, 500, 600]
 
-for date_offset in range(0, 31):
-    departure_date = (base_date + timedelta(days=date_offset)).strftime("%Y-%m-%d")
+# 무궁화 넣는 코드
+insert_train_schedules(
+    start_train_number = Gyeongbu_up_train_number[0],
+    route_id = 1,
+    start_year = 2025,
+    start_month = 10,
+    train_type = 100,
+    start_time_str = '06:00',
+    end_time_str = '23:50',
+    interval_minutes = 60,
+    runtime_minutes = 335,
+    cursor = cursor,
+    conn = conn)
 
-    insert_train_schedules(
-        cursor=cursor,
-        initial_departure=datetime.strptime("06:00", "%H:%M"),
-        start_train_id=100,
-        start_train_number=100,
-        route=1,
-        departure_date = departure_date,
-        train_interval=30,
-        station_interval_list=mugunghwa_interval,
-        repeat_count = 25
-    )
+# ITX 넣는 코드
+insert_train_schedules(
+    start_train_number = Gyeongbu_up_train_number[1],
+    route_id = 1,
+    start_year = 2025,
+    start_month = 10,
+    train_type = 1000,
+    start_time_str = '06:30',
+    end_time_str = '23:50',
+    interval_minutes = 60,
+    runtime_minutes = 279,
+    cursor = cursor,
+    conn = conn)
 
-print('무궁화 끝!')
 
-# # ITX 입력
-for date_offset in range(0, 31):
-    departure_date = (base_date + timedelta(days=date_offset)).strftime("%Y-%m-%d")
+# KTX 넣는 코드
+insert_train_schedules(
+    start_train_number = Gyeongbu_up_train_number[2],
+    route_id = 1,
+    start_year = 2025,
+    start_month = 10,
+    train_type = 2000,
+    start_time_str = '06:20',
+    end_time_str = '23:50',
+    interval_minutes = 20,
+    runtime_minutes = 164,
+    cursor = cursor,
+    conn = conn)
 
-    insert_train_schedules(
-        cursor=cursor,
-        initial_departure=datetime.strptime("06:30", "%H:%M"),
-        start_train_id=1000,
-        start_train_number=200,
-        route=1,
-        departure_date = departure_date,
-        train_interval=30,
-        station_interval_list=ITX_interval,
-        repeat_count = 25
-    )
 
-print('ITX 끝!')
-
-for date_offset in range(0, 31):
-    departure_date = (base_date + timedelta(days=date_offset)).strftime("%Y-%m-%d")
-
-    insert_train_schedules(
-        cursor=cursor,
-        initial_departure=datetime.strptime("06:00", "%H:%M"),
-        start_train_id=2000,
-        start_train_number=300,
-        route=1,
-        departure_date = departure_date,
-        train_interval=20,
-        station_interval_list=KTX_interval,
-        repeat_count = 49
-    )
-
-print('KTX 끝!')
-
-conn.commit()
 conn.close()
