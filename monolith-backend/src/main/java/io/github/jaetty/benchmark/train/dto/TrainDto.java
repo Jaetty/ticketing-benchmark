@@ -2,8 +2,6 @@ package io.github.jaetty.benchmark.train.dto;
 
 import lombok.*;
 
-import java.time.LocalDateTime;
-
 @Getter
 @Setter
 @Builder
@@ -11,9 +9,8 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class TrainDto {
 
-    int trainId;
-    String name;
-    LocalDateTime departureTime;
-    LocalDateTime arrivalTime;
+    Long trainId;
+    Integer trainTypeId;
+    String trainName;
 
 }
