@@ -21,7 +21,7 @@ public class ScheduleServiceTest {
         List<AvailableScheduleInterfaceDto> list = scheduleRepository.findAvailableSchedules(1, "06:00:00", "2025-10-01", 1, 9);
         StringBuilder sb = new StringBuilder();
 
-        sb.append("스케쥴ID 루트ID 기차ID 기차종류\t\t기차이름 \t출발시간 \t 가능한석").append("\n");
+        sb.append("스케쥴ID 루트ID 기차ID 기차종류\t\t기차이름 \t출발시간 \t 가능한석    순번").append("\n");
         int index = 1;
 
         for(AvailableScheduleInterfaceDto dto : list) {
