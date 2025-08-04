@@ -61,6 +61,14 @@ jobs:
 
       - name: Grant execute permission for gradlew
         run: chmod +x ./monolith-backend/gradlew
+      
+      - name: Wait for MariaDB to be ready # MariaDB가 실행될 때까지 제대로 기다림
+        run: |
+          for i in $(seq 1 10); do
+            nc -z localhost 3306 && break
+            echo "Waiting for MariaDB..."
+            sleep 1
+          done
 
       - name: Build with Gradle
         run: ./gradlew build
