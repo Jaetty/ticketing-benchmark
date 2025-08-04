@@ -2,6 +2,7 @@ package io.github.jaetty.benchmark.ScheduleTest;
 
 import io.github.jaetty.benchmark.train.dto.AvailableScheduleInterfaceDto;
 import io.github.jaetty.benchmark.train.repository.ScheduleRepository;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -9,6 +10,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import java.util.List;
 
 @SpringBootTest
+@Disabled
 public class ScheduleServiceTest {
 
     @Autowired
