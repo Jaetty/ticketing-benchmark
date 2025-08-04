@@ -71,7 +71,7 @@ jobs:
           done
 
       - name: Build with Gradle
-        run: ./gradlew build -Dspring.profiles.active=ci
+        run: ./gradlew build -Dspring.profiles.active=ci --info
         working-directory: ./monolith-backend
 
       - name: Log in to Docker Hub
