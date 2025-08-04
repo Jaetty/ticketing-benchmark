@@ -1,0 +1,12 @@
+# ci/cd 테스트 통과용 application-ci.yml
+spring:
+  datasource:
+    url: jdbc:mariadb://127.0.0.1:3306/testdb
+    driver-class-name: org.mariadb.jdbc.Driver
+    username: root
+    password: rootpassword
+
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    database-platform: org.hibernate.dialect.MariaDBDialect
