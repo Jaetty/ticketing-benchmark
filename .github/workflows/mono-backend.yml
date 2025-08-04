@@ -32,6 +32,23 @@ jobs:
     needs: change-check # check가 먼저 실행되어야한다.
     if: needs.change-check.outputs.monolith_backend_changed == 'true' # check 부분에서 outputs에 정의된 변수 값을 확인함. 즉 특정 디렉토리에 변화가 있는지 확인.
 
+    # ----------------------------------------------------
+    # MariaDB 컨테이너 추가
+    # ----------------------------------------------------
+    services:
+      mariadb:
+        image: mariadb:10.6
+        env:
+          MYSQL_ROOT_PASSWORD: rootpassword
+          MYSQL_DATABASE: testdb
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd "mysqladmin ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+          
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -46,8 +63,14 @@ jobs:
         run: chmod +x ./monolith-backend/gradlew
 
       - name: Build with Gradle
-        run: ./gradlew build -Dspring.profiles.active=ci
+        run: ./gradlew build
         working-directory: ./monolith-backend
+        env:
+          SPRING_DATASOURCE_URL: jdbc:mariadb://127.0.0.1:3306/testdb?allowPublicKeyRetrieval=true&useSSL=false
+          SPRING_DATASOURCE_USERNAME: root
+          SPRING_DATASOURCE_PASSWORD: rootpassword
+          SPRING_JPA_HIBERNATE_DDL_AUTO: create-drop
+          SPRING_JPA_DATABASE_PLATFORM: org.hibernate.dialect.MariaDBDialect
 
       - name: Log in to Docker Hub
         uses: docker/login-action@v2
