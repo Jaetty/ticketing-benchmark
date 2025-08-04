@@ -46,7 +46,7 @@ jobs:
         run: chmod +x ./monolith-backend/gradlew
 
       - name: Build with Gradle
-        run: ./gradlew build
+        run: ./gradlew build -Dspring.profiles.active=ci
         working-directory: ./monolith-backend
 
       - name: Log in to Docker Hub
