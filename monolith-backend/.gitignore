@@ -35,3 +35,19 @@ out/
 
 ### VS Code ###
 .vscode/
+
+# 백엔드 빌드 결과물
+target/
+
+# Spring Boot 환경설정 (보통은 따로 무시할 필요 없음, 필요하면 추가)
+application.yml
+application.properties
+
+# 컴파일 결과물
+*.class
+*.jar
+*.war
+
+# 로그, 리포트
+/test-output/
+*.log

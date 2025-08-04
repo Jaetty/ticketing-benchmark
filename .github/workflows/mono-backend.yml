@@ -32,6 +32,23 @@ jobs:
     needs: change-check # check가 먼저 실행되어야한다.
     if: needs.change-check.outputs.monolith_backend_changed == 'true' # check 부분에서 outputs에 정의된 변수 값을 확인함. 즉 특정 디렉토리에 변화가 있는지 확인.
 
+    # ----------------------------------------------------
+    # MariaDB 컨테이너 추가
+    # ----------------------------------------------------
+    services:
+      mariadb:
+        image: mariadb:10.6
+        env:
+          MYSQL_ROOT_PASSWORD: rootpassword
+          MYSQL_DATABASE: testdb
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd "mysqladmin ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+          
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -44,9 +61,17 @@ jobs:
 
       - name: Grant execute permission for gradlew
         run: chmod +x ./monolith-backend/gradlew
+      
+      - name: Wait for MariaDB to be ready # MariaDB가 실행될 때까지 제대로 기다림
+        run: |
+          for i in $(seq 1 10); do
+            nc -z localhost 3306 && break
+            echo "Waiting for MariaDB..."
+            sleep 1
+          done
 
       - name: Build with Gradle
-        run: ./gradlew build
+        run: ./gradlew build -Dspring.profiles.active=ci --info
         working-directory: ./monolith-backend
 
       - name: Log in to Docker Hub
